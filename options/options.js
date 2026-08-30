@@ -23,23 +23,23 @@ async function loadSettings() {
 
   document.getElementById('opt-endpoint-claude').value = settings.endpoints?.claude || 'https://api.anthropic.com/v1';
   document.getElementById('opt-key-claude').value = settings.apiKeys?.claude || '';
-  document.getElementById('opt-model-claude').value = settings.models?.claude || 'claude-3-7-sonnet-20250219';
+  document.getElementById('opt-model-claude').value = settings.models?.claude || 'claude-5-sonnet';
 
   document.getElementById('opt-endpoint-custom').value = settings.endpoints?.custom || 'https://api.openai.com/v1';
   document.getElementById('opt-key-custom').value = settings.apiKeys?.custom || '';
-  document.getElementById('opt-model-custom').value = settings.models?.custom || 'qwen2.5-vl';
+  document.getElementById('opt-model-custom').value = settings.models?.custom || 'qwen3.8-27b';
 
   // Populate cached models if available
   if (settings.cachedModelLists?.gemini?.length > 0) {
-    populateModelSelect('opt-model-gemini', settings.cachedModelLists.gemini, settings.models?.gemini || 'gemini-2.0-flash');
+    populateModelSelect('opt-model-gemini', settings.cachedModelLists.gemini, settings.models?.gemini || 'gemini-3.7-flash');
   } else {
-    document.getElementById('opt-model-gemini').value = settings.models?.gemini || 'gemini-2.0-flash';
+    document.getElementById('opt-model-gemini').value = settings.models?.gemini || 'gemini-3.7-flash';
   }
 
   if (settings.cachedModelLists?.openai?.length > 0) {
-    populateModelSelect('opt-model-openai', settings.cachedModelLists.openai, settings.models?.openai || 'gpt-4o');
+    populateModelSelect('opt-model-openai', settings.cachedModelLists.openai, settings.models?.openai || 'gpt-5.5-instant');
   } else {
-    document.getElementById('opt-model-openai').value = settings.models?.openai || 'gpt-4o';
+    document.getElementById('opt-model-openai').value = settings.models?.openai || 'gpt-5.5-instant';
   }
 
   document.getElementById('opt-mj-v').value = settings.midjourneyPreset?.version || '6.1';
@@ -96,6 +96,17 @@ function setupEventListeners() {
     };
   });
 
+  // Domestic / Custom preset selector binding
+  const presetCustom = document.getElementById('opt-preset-custom-select');
+  const inputModelCustom = document.getElementById('opt-model-custom');
+  if (presetCustom && inputModelCustom) {
+    presetCustom.onchange = () => {
+      if (presetCustom.value !== 'custom') {
+        inputModelCustom.value = presetCustom.value;
+      }
+    };
+  }
+
   // Dynamic Gemini Models Fetcher
   const btnFetchGemini = document.getElementById('opt-btn-fetch-gemini');
   btnFetchGemini.onclick = async () => {
@@ -106,21 +117,21 @@ function setupEventListeners() {
       return;
     }
 
-    btnFetchGemini.innerText = '⏳ 正在拉取模型列表...';
+    btnFetchGemini.innerText = '⏳ 正在拉取 2026 最新模型列表...';
     try {
       const models = await AIService.fetchAvailableModels('gemini', apiKey, endpoint);
       if (models.length === 0) throw new Error('未获取到可用模型');
 
-      populateModelSelect('opt-model-gemini', models, 'gemini-2.0-flash');
+      populateModelSelect('opt-model-gemini', models, 'gemini-3.7-flash');
 
       const settings = await StorageService.getSettings();
       settings.cachedModelLists = settings.cachedModelLists || {};
       settings.cachedModelLists.gemini = models;
       await StorageService.saveSettings(settings);
 
-      btnFetchGemini.innerText = `✅ 已成功获取 ${models.length} 个最新模型！`;
+      btnFetchGemini.innerText = `✅ 已成功获取 ${models.length} 个 Google 模型！`;
       setTimeout(() => {
-        btnFetchGemini.innerText = '🔄 自动拉取/刷新 Google 最新模型列表';
+        btnFetchGemini.innerText = '🔄 自动拉取/刷新 Google 最新 2026 模型列表';
       }, 3000);
       showToast(`✨ 成功拉取 ${models.length} 个 Google 模型！`);
     } catch (err) {
@@ -145,7 +156,7 @@ function setupEventListeners() {
       const filtered = models.filter(m => m.includes('gpt') || m.includes('o1') || m.includes('o3') || m.includes('chatgpt') || m.includes('dall'));
       const listToUse = filtered.length > 0 ? filtered : models;
 
-      populateModelSelect('opt-model-openai', listToUse, 'gpt-4o');
+      populateModelSelect('opt-model-openai', listToUse, 'gpt-5.5-instant');
 
       const settings = await StorageService.getSettings();
       settings.cachedModelLists = settings.cachedModelLists || {};
@@ -154,7 +165,7 @@ function setupEventListeners() {
 
       btnFetchOpenAI.innerText = `✅ 获取到 ${listToUse.length} 个模型！`;
       setTimeout(() => {
-        btnFetchOpenAI.innerText = '🔄 刷新 OpenAI 可用模型';
+        btnFetchOpenAI.innerText = '🔄 刷新 OpenAI 2026 可用模型';
       }, 3000);
       showToast(`✨ 成功拉取 ${listToUse.length} 个 OpenAI 模型！`);
     } catch (err) {
@@ -162,6 +173,38 @@ function setupEventListeners() {
       btnFetchOpenAI.innerText = '❌ 拉取失败，点击重试';
     }
   };
+
+  // Dynamic Custom Endpoint Fetcher
+  const btnFetchCustom = document.getElementById('opt-btn-fetch-custom');
+  if (btnFetchCustom) {
+    btnFetchCustom.onclick = async () => {
+      const apiKey = document.getElementById('opt-key-custom').value.trim();
+      const endpoint = document.getElementById('opt-endpoint-custom').value.trim();
+      if (!endpoint) {
+        alert('请先输入自定义 Base URL！');
+        return;
+      }
+      btnFetchCustom.innerText = '⏳ 正在获取...';
+      try {
+        const models = await AIService.fetchAvailableModels('custom', apiKey, endpoint);
+        if (models.length > 0) {
+          presetCustom.innerHTML = '';
+          models.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m;
+            opt.innerText = m;
+            presetCustom.appendChild(opt);
+          });
+          inputModelCustom.value = models[0];
+          btnFetchCustom.innerText = `✅ 获取到 ${models.length} 个端点模型！`;
+          showToast(`✨ 成功拉取 ${models.length} 个模型！`);
+        }
+      } catch (e) {
+        alert('获取失败: ' + e.message);
+        btnFetchCustom.innerText = '❌ 获取失败';
+      }
+    };
+  }
 
   // Auto fetch Gemini models on key input blur if empty
   const keyInputGemini = document.getElementById('opt-key-gemini');
@@ -237,12 +280,12 @@ async function getCurrentFormSettings() {
 
   let geminiModel = document.getElementById('opt-model-gemini').value;
   if (geminiModel === 'custom') {
-    geminiModel = document.getElementById('opt-model-gemini-custom').value.trim() || 'gemini-2.0-flash';
+    geminiModel = document.getElementById('opt-model-gemini-custom').value.trim() || 'gemini-3.7-flash';
   }
 
   let openaiModel = document.getElementById('opt-model-openai').value;
   if (openaiModel === 'custom') {
-    openaiModel = document.getElementById('opt-model-openai-custom').value.trim() || 'gpt-4o';
+    openaiModel = document.getElementById('opt-model-openai-custom').value.trim() || 'gpt-5.5-instant';
   }
 
   return {

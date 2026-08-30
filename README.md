@@ -1,30 +1,32 @@
-# PromptCard - Image to Prompt AI 浏览器扩展
+# PromptCard - Image to Prompt AI 浏览器扩展 (2026 前沿版)
 
-> 🚀 **2026 旗舰级多模态图像逆向解析器**：一键将网页图片或屏幕框选截图逆向解构为 **Midjourney v6.1, FLUX.1.1 Pro, Stable Diffusion 3.5, DALL-E 3** 等高质量 AI 提示词与专业视觉维度标签。
+> 🚀 **2026 旗舰级全模态图像逆向解析器**：一键将网页图片或屏幕框选截图逆向解构为 **Midjourney v6.1, FLUX.1.1 Pro, Stable Diffusion 3.5, DALL-E 3** 等高质量 AI 提示词与专业视觉维度标签。
 
 ---
 
-## ✨ 核心特性
+## ✨ 2026 核心特性与前沿模型矩阵
 
-### 1. 🌐 2026 前沿多模态视觉大模型直连（免积分限制 / 自由配置）
+### 1. 🤖 2026 前沿多模态视觉大模型直连（免积分限制 / 自由配置）
 
-- **✨ 离线演示模式 (Mock AI)**：
-  - 内置基于图片特征哈希的专业级动态提示词生成引擎（包含摄影、日漫、时尚、3D角色、巴洛克油画、赛博朋克等预设），无需任何 API Key，开箱即用。
-- **🌐 Google Gemini 2.0 / 1.5 系列**：
-  - 支持 **Gemini 2.0 Flash / Pro**、**Gemini 1.5 Flash / Pro** 以及前沿 **Flash Thinking / Experimental** 系列。
-  - **支持在设置中心一键 🔄 自动拉取 Google 官方最新模型列表**，享受 Google AI Studio 每日免费多模态额度。
-- **🤖 OpenAI GPT-4o / o3-mini / o1 系列**：
-  - 支持 **GPT-4o**、**GPT-4o-mini**、**o3-mini** 及 **o1** 视觉深度推理，支持自动拉取可用模型列表。
-- **🧠 Anthropic Claude 3.7 / 3.5 系列**：
-  - 支持 **Claude 3.7 Sonnet (混合思维链推理)**、**Claude 3.5 Sonnet** 与 **Claude 3.5 Haiku**，在艺术流派、构图修辞与光影词汇上具备极强审美能力。
-- **⚡ 自定义 / 本地 / 开源视觉大模型**：
-  - 原生兼容任何 OpenAI 规范端点，轻松接入 **Qwen2.5-VL (通义千问视觉)**、**DeepSeek-VL2**、**Ollama**、**SiliconFlow (硅基流动)**、**OneAPI / NewAPI** 及 **vLLM** 本地私有化算力。
+本项目已全面对齐 **2026 年最新主流大模型与国产开源视觉生态**，支持在设置中心一键 **`🔄 自动拉取官方最新模型列表`**：
+
+| 模型阵营 / 实验室 | 2026 主流旗舰模型矩阵 | 特性与适用场景 |
+| :--- | :--- | :--- |
+| **Google Gemini** | **Gemini 3.7 Flash** (2026 最新极速工作旗舰)<br>**Gemini 3.5 Pro** / **Gemini 2.0 Flash** / **Gemini 2.0 Flash Thinking** | 毫秒级极速响应，支持 Google AI Studio 每日免费多模态额度，设置中心支持一键实时拉取 Google 官方最新模型列表。 |
+| **Anthropic Claude** | **Claude 5.0 (Sonnet 5 / Opus 5)**<br>**Claude 3.7 Sonnet** (混合思维链推理)<br>**Claude 3.5 Sonnet** | 顶级艺术审美、复杂修辞、摄影布光与构图辨析，深度还原高质量艺术与写实质感。 |
+| **OpenAI** | **GPT-5.6 Sol** (复杂多模态推理旗舰)<br>**GPT-5.5 Instant** (默认高响应助理)<br>**o3 / o3-mini** / **GPT-4o** | 全球领先的多模态细节识别与长程提示词语义组织能力。 |
+| **阿里通义千问 (Qwen)** | **Qwen3.8-27B** (2026 开源多模态旗舰)<br>**Qwen3.8-VL** / **Qwen2.5-VL-72B** | 统一原生多模态预训练，支持本地 Ollama、vLLM 或阿里云百炼/硅基流动端点接入。 |
+| **月之暗面 (Kimi)** | **Kimi K3** (~2.8T MoE 全模态旗舰)<br>**Kimi k1.5** / **Moonshot-v1** | 超长上下文与复杂视觉构图理解。 |
+| **智谱 AI (GLM)** | **GLM-5.3-Flash** (2026 混合稀疏与线性注意力)<br>**GLM-5.2** / **GLM-4V** | 优秀的视觉文档分析、艺术维度拆解与高并发推理能力。 |
+| **DeepSeek** | **DeepSeek-V4-Flash-Vision-Exp**<br>**DeepSeek-VL2** / **DeepSeek-V3** | 超高性价比与 MLA 极速视觉推理。 |
+| **字节豆包 / MiniMax** | **Doubao-Vision-Pro** / **abab7-vision** | 适应国内云端 API 快速部署。 |
+| **✨ 离线演示 (Mock AI)** | **动态特征哈希 Mock 引擎** | 无需 API Key，基于图片特征动态输出摄影、日漫、时尚、3D、油画、赛博朋克等风格提示词。 |
 
 ---
 
 ### 2. 🎨 全能生图提示词转换矩阵
 
-一键解析并自动转换为对应模型的黄金生图语法：
+一键解析并自动转换为对应生成器的黄金生图语法：
 
 | 生成器目标 | 输出格式与特性 | 示例支持 |
 | :--- | :--- | :--- |
