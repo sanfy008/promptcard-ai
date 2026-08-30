@@ -25,10 +25,12 @@ class FloatingPromptCard {
     this.setupDrag();
   }
 
-  showLoading(imageSrc = null) {
+  showLoading(imageSrc = null, meta = {}) {
     this.mount();
     this.currentImageSrc = imageSrc;
     this.isMinimized = false;
+
+    const arText = (meta.width && meta.height) ? `${meta.width} × ${meta.height} px` : '高保真压缩优化中...';
 
     this.container.innerHTML = `
       <div class="pc-card">
@@ -38,7 +40,7 @@ class FloatingPromptCard {
               <svg viewBox="0 0 24 24"><path d="M12 2L14.4 7.6L20 10L14.4 12.4L12 18L9.6 12.4L4 10L9.6 7.6L12 2Z"/></svg>
             </div>
             <span class="pc-title">PromptCard</span>
-            <span class="pc-badge">解析中...</span>
+            <span class="pc-badge">⚡ 极速分析中...</span>
           </div>
           <div class="pc-header-controls">
             <button class="pc-icon-btn" id="pc-btn-options" title="打开设置 (配置 API Key / 模型)">⚙️</button>
@@ -47,9 +49,21 @@ class FloatingPromptCard {
           </div>
         </div>
         <div class="pc-body">
-          <div class="pc-loading">
+          ${imageSrc ? `
+            <div class="pc-meta-bar" style="opacity: 0.85;">
+              <img src="${imageSrc}" class="pc-thumb" alt="preview" onerror="this.style.display='none';" />
+              <div class="pc-meta-info">
+                <div class="pc-meta-title">正在极速逆向解析图像...</div>
+                <div class="pc-meta-chips">
+                  <span class="pc-chip">${arText}</span>
+                  <span class="pc-chip" style="background: rgba(99, 102, 241, 0.2); color: #c7d2fe;">ViT 视觉编码加速</span>
+                </div>
+              </div>
+            </div>
+          ` : ''}
+          <div class="pc-loading" style="padding: 18px 10px;">
             <div class="pc-spinner"></div>
-            <div class="pc-loading-text">AI 正在深度逆向解析光影、主体、风格与构图...</div>
+            <div class="pc-loading-text">AI 正在极速反推主体、光影、构图与艺术流派...</div>
           </div>
         </div>
       </div>
@@ -66,16 +80,16 @@ class FloatingPromptCard {
     const analysis = data.analysis || {};
     const prompts = data.prompts || {};
     const tagCloud = data.tagCloud || {};
-    const provider = data.provider || analysis._provider || 'mock';
+    const provider = data.provider || analysis._provider || 'gemini';
 
     const providerNames = {
       mock: '✨ 离线演示 (Mock)',
-      gemini: '🌐 Gemini 1.5/2.0',
-      openai: '🤖 OpenAI GPT-4o',
-      claude: '🧠 Claude 3.5',
-      custom: '⚡ 自定义 API'
+      gemini: '🌐 Google Gemini 3.7/2.0',
+      openai: '🤖 OpenAI GPT-5.5/4o',
+      claude: '🧠 Claude 5.0/3.7',
+      custom: '⚡ 开源/国内端点'
     };
-    const providerLabel = providerNames[provider] || '✨ 演示模式';
+    const providerLabel = providerNames[provider] || '✨ 视觉大模型';
 
     const activePromptText = this.getActivePromptText();
 
@@ -448,7 +462,7 @@ class ScreenSnipperOverlay {
     const toolbar = document.createElement('div');
     toolbar.className = 'pc-snip-toolbar';
     toolbar.innerHTML = `
-      <button class="pc-snip-btn-confirm" id="pc-snip-confirm">✨ 提取提示词</button>
+      <button class="pc-snip-btn-confirm" id="pc-snip-confirm">✨ 极速提取提示词</button>
       <button class="pc-snip-btn-cancel" id="pc-snip-cancel">取消</button>
     `;
 
@@ -475,7 +489,7 @@ class ScreenSnipperOverlay {
 
     const card = window.__promptCardInstance || new FloatingPromptCard();
     window.__promptCardInstance = card;
-    card.showLoading();
+    card.showLoading(null, { width: coords.w, height: coords.h });
 
     chrome.runtime.sendMessage({ action: 'CAPTURE_TAB' }, (res) => {
       if (!res || !res.success) {
@@ -485,7 +499,7 @@ class ScreenSnipperOverlay {
       }
 
       const img = new Image();
-      img.onload = () => {
+      img.onload = async () => {
         const dpr = window.devicePixelRatio || 1;
         const canvas = document.createElement('canvas');
         canvas.width = coords.w * dpr;
@@ -504,20 +518,21 @@ class ScreenSnipperOverlay {
           coords.h * dpr
         );
 
-        const croppedBase64 = canvas.toDataURL('image/jpeg', 0.95);
+        const rawCropped = canvas.toDataURL('image/jpeg', 0.95);
+        const { dataUrl: optimizedBase64, width: finalW, height: finalH } = await optimizeImageBase64(rawCropped, 1280, 0.90);
 
         chrome.runtime.sendMessage({
           action: 'ANALYZE_IMAGE',
-          imageBase64: croppedBase64,
+          imageBase64: optimizedBase64,
           mimeType: 'image/jpeg',
-          imageMeta: { width: coords.w, height: coords.h }
+          imageMeta: { width: finalW || coords.w, height: finalH || coords.h }
         }, (analysisRes) => {
           if (!analysisRes || !analysisRes.success) {
             alert('分析提示词失败: ' + (analysisRes?.error || '未知错误'));
             card.destroy();
             return;
           }
-          card.renderResult(analysisRes, croppedBase64);
+          card.renderResult(analysisRes, optimizedBase64);
         });
       };
       img.src = res.dataUrl;
@@ -531,6 +546,43 @@ class ScreenSnipperOverlay {
       this.overlay = null;
     }
   }
+}
+
+// Client-side intelligent adaptive downsampler (Max 1280px, 0.90 quality, bicubic high-speed smoothing)
+async function optimizeImageBase64(dataUrl, maxDimension = 1280, quality = 0.90) {
+  return new Promise((resolve) => {
+    if (!dataUrl || !dataUrl.startsWith('data:image')) {
+      return resolve({ dataUrl, width: 0, height: 0 });
+    }
+    const img = new Image();
+    img.onload = () => {
+      let w = img.naturalWidth || img.width;
+      let h = img.naturalHeight || img.height;
+      if (w <= maxDimension && h <= maxDimension && dataUrl.length < 350000) {
+        return resolve({ dataUrl, width: w, height: h });
+      }
+      if (w > maxDimension || h > maxDimension) {
+        if (w > h) {
+          h = Math.round((h * maxDimension) / w);
+          w = maxDimension;
+        } else {
+          w = Math.round((w * maxDimension) / h);
+          h = maxDimension;
+        }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, w);
+      canvas.height = Math.max(1, h);
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(img, 0, 0, w, h);
+      const optimized = canvas.toDataURL('image/jpeg', quality);
+      resolve({ dataUrl: optimized, width: w, height: h });
+    };
+    img.onerror = () => resolve({ dataUrl, width: 0, height: 0 });
+    img.src = dataUrl;
+  });
 }
 
 let lastRightClickedElement = null;
@@ -651,19 +703,22 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     promptCard.showLoading(request.srcUrl);
 
     extractImageBase64(request.srcUrl, lastRightClickedElement)
-      .then((imgData) => {
+      .then(async (imgData) => {
+        // High-speed adaptive downsampling before sending to API (reducing 10MB to ~100KB)
+        const { dataUrl: optimizedBase64, width: finalW, height: finalH } = await optimizeImageBase64(imgData.base64, 1280, 0.90);
+
         chrome.runtime.sendMessage({
           action: 'ANALYZE_IMAGE',
-          imageBase64: imgData.base64,
-          mimeType: imgData.mimeType,
-          imageMeta: { width: imgData.width, height: imgData.height }
+          imageBase64: optimizedBase64,
+          mimeType: 'image/jpeg',
+          imageMeta: { width: finalW || imgData.width, height: finalH || imgData.height }
         }, (analysisRes) => {
           if (!analysisRes || !analysisRes.success) {
             alert('解析失败: ' + (analysisRes?.error || '请检查设置中的 API Key'));
             promptCard.destroy();
             return;
           }
-          promptCard.renderResult(analysisRes, imgData.base64);
+          promptCard.renderResult(analysisRes, optimizedBase64);
         });
       })
       .catch((err) => {

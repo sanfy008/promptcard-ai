@@ -17,10 +17,10 @@ async function updateEngineHeader() {
   const settings = await StorageService.getSettings();
   const providerNames = {
     mock: '✨ 离线演示模式 (Mock)',
-    gemini: `🌐 Google Gemini (${settings.models?.gemini || '1.5-flash'})`,
-    openai: `🤖 OpenAI (${settings.models?.openai || 'gpt-4o'})`,
-    claude: `🧠 Claude (${settings.models?.claude || '3.5'})`,
-    custom: `⚡ 自定义 (${settings.models?.custom || 'gpt-4o'})`
+    gemini: `🌐 Google Gemini (${settings.models?.gemini || '3.7-flash'})`,
+    openai: `🤖 OpenAI (${settings.models?.openai || 'gpt-5.5'})`,
+    claude: `🧠 Claude (${settings.models?.claude || '5.0'})`,
+    custom: `⚡ 开源/国内 (${settings.models?.custom || 'qwen3.8'})`
   };
   document.getElementById('sp-header-engine').innerText = providerNames[settings.provider] || '离线演示模式';
 }
@@ -130,15 +130,52 @@ function setupEvents() {
   });
 }
 
+async function optimizeImageBase64(dataUrl, maxDimension = 1280, quality = 0.90) {
+  return new Promise((resolve) => {
+    if (!dataUrl || !dataUrl.startsWith('data:image')) {
+      return resolve({ dataUrl, width: 0, height: 0 });
+    }
+    const img = new Image();
+    img.onload = () => {
+      let w = img.naturalWidth || img.width;
+      let h = img.naturalHeight || img.height;
+      if (w <= maxDimension && h <= maxDimension && dataUrl.length < 350000) {
+        return resolve({ dataUrl, width: w, height: h });
+      }
+      if (w > maxDimension || h > maxDimension) {
+        if (w > h) {
+          h = Math.round((h * maxDimension) / w);
+          w = maxDimension;
+        } else {
+          w = Math.round((w * maxDimension) / h);
+          h = maxDimension;
+        }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, w);
+      canvas.height = Math.max(1, h);
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(img, 0, 0, w, h);
+      const optimized = canvas.toDataURL('image/jpeg', quality);
+      resolve({ dataUrl: optimized, width: w, height: h });
+    };
+    img.onerror = () => resolve({ dataUrl, width: 0, height: 0 });
+    img.src = dataUrl;
+  });
+}
+
 function handleImageFile(file) {
   const reader = new FileReader();
   reader.onload = async (e) => {
-    const base64 = e.target.result;
+    const rawBase64 = e.target.result;
     showLoading();
 
     try {
+      const { dataUrl: optimizedBase64, width: w, height: h } = await optimizeImageBase64(rawBase64, 1280, 0.90);
       const settings = await StorageService.getSettings();
-      const analysis = await AIService.analyzeImage(base64, file.type, settings);
+      const analysis = await AIService.analyzeImage(optimizedBase64, 'image/jpeg', settings, { width: w, height: h });
 
       const prompts = {
         midjourney: PromptParser.formatMidjourney(analysis, settings.midjourneyPreset),
@@ -152,8 +189,8 @@ function handleImageFile(file) {
       const historyItem = {
         id: 'pc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
         timestamp: Date.now(),
-        thumbnail: base64.length < 500000 ? base64 : null,
-        provider: settings.provider || 'mock',
+        thumbnail: optimizedBase64.length < 500000 ? optimizedBase64 : null,
+        provider: settings.provider || 'gemini',
         analysis,
         prompts,
         tagCloud,
@@ -161,7 +198,7 @@ function handleImageFile(file) {
       };
 
       await StorageService.addHistoryItem(historyItem);
-      renderAnalysisResult({ analysis, prompts, tagCloud, historyItem }, base64);
+      renderAnalysisResult({ analysis, prompts, tagCloud, historyItem }, optimizedBase64);
     } catch (err) {
       alert('解析失败: ' + err.message);
       hideLoading();
@@ -286,7 +323,7 @@ async function renderHistoryList(searchQuery = '', favOnly = false) {
           ${thumb ? `<img src="${thumb}" style="width:36px;height:36px;border-radius:4px;object-fit:cover;">` : `<div style="width:36px;height:36px;background:#27272a;border-radius:4px;display:flex;align-items:center;justify-content:center;">✨</div>`}
           <div style="flex:1;overflow:hidden;">
             <div style="font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(title)}</div>
-            <div style="font-size:10px;color:#71717a;">${time} · ${item.provider || 'mock'}</div>
+            <div style="font-size:10px;color:#71717a;">${time} · ${item.provider || 'gemini'}</div>
           </div>
           <span>${item.favorite ? '⭐' : ''}</span>
         </div>
