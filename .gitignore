@@ -1,0 +1,15 @@
+# OS generated files
+.DS_Store
+Thumbs.db
+*.tmp
+*.log
+
+# Node & Editor
+node_modules/
+.vscode/
+.idea/
+
+# Testing artifacts
+test_*.html
+*.pyc
+__pycache__/

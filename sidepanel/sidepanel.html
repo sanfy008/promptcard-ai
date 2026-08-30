@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PromptCard 侧边工作台</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <div class="sp-container">
+    <header class="sp-header">
+      <div class="sp-brand">
+        <div class="sp-logo">
+          <svg viewBox="0 0 24 24"><path d="M12 2L14.4 7.6L20 10L14.4 12.4L12 18L9.6 12.4L4 10L9.6 7.6L12 2Z"/></svg>
+        </div>
+        <div>
+          <h1 class="sp-title">PromptCard</h1>
+          <p class="sp-sub" id="sp-header-engine">离线演示模式 (Mock AI)</p>
+        </div>
+      </div>
+      <div class="sp-header-actions">
+        <button class="sp-icon-btn" id="sp-btn-snip" title="截取屏幕区域 (Alt+Shift+P)">✂️</button>
+        <button class="sp-icon-btn" id="sp-btn-options" title="设置中心">⚙️</button>
+      </div>
+    </header>
+
+    <div class="sp-nav-tabs">
+      <button class="sp-nav-btn active" data-view="analyze">🎨 视觉反推</button>
+      <button class="sp-nav-btn" data-view="history">📜 历史与收藏</button>
+    </div>
+
+    <main class="sp-main">
+      <!-- View 1: Analyze / Active Inspector -->
+      <div class="sp-view active" id="view-analyze">
+        <div class="sp-upload-dropzone" id="sp-dropzone">
+          <input type="file" id="sp-file-input" accept="image/*" style="display:none;">
+          <div class="sp-dropzone-content">
+            <div class="sp-drop-icon">🖼️</div>
+            <div class="sp-drop-text">拖放图片到此处，或 <span class="sp-link">点击上传</span></div>
+            <div class="sp-drop-sub">支持右键网页图片直接在此解析</div>
+          </div>
+        </div>
+
+        <div class="sp-result-area" id="sp-result-area" style="display:none;">
+          <div class="sp-preview-card">
+            <img id="sp-preview-img" class="sp-preview-img" src="" alt="preview">
+            <div class="sp-preview-info">
+              <div class="sp-meta-title" id="sp-meta-title">视觉解析完成</div>
+              <div class="sp-meta-chips" id="sp-meta-chips">
+                <span class="sp-chip" id="sp-chip-ar">16:9</span>
+                <span class="sp-chip" id="sp-chip-style">Artistic</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sp-lang-bar">
+            <button class="sp-lang-pill active" data-lang="en">EN (生图推荐)</button>
+            <button class="sp-lang-pill" data-lang="zh-CN">简体中文</button>
+            <button class="sp-lang-pill" data-lang="zh-TW">繁體中文</button>
+            <button class="sp-lang-pill" data-lang="ja">日本語</button>
+          </div>
+
+          <div class="sp-prompt-tabs">
+            <button class="sp-prompt-tab active" data-tab="midjourney">Midjourney</button>
+            <button class="sp-prompt-tab" data-tab="flux">FLUX</button>
+            <button class="sp-prompt-tab" data-tab="sd">SD / SDXL</button>
+            <button class="sp-prompt-tab" data-tab="dalle">DALL-E 3</button>
+            <button class="sp-prompt-tab" data-tab="breakdown">维度解构</button>
+          </div>
+
+          <div class="sp-prompt-card">
+            <div class="sp-prompt-content" id="sp-prompt-content"></div>
+            <div class="sp-prompt-actions">
+              <button class="sp-btn-primary" id="sp-btn-copy">📋 一键复制提示词</button>
+              <button class="sp-btn-icon" id="sp-btn-fav" title="收藏">⭐</button>
+            </div>
+          </div>
+
+          <div class="sp-tags-wrapper" id="sp-tags-wrapper"></div>
+        </div>
+
+        <div class="sp-loading-card" id="sp-loading-card" style="display:none;">
+          <div class="sp-spinner"></div>
+          <div class="sp-loading-text">AI 正在深度解析画面特征与艺术维度...</div>
+        </div>
+      </div>
+
+      <!-- View 2: History & Favorites -->
+      <div class="sp-view" id="view-history">
+        <div class="sp-history-toolbar">
+          <div class="sp-search-box">
+            <input type="text" id="sp-history-search" class="sp-search-input" placeholder="🔍 搜索历史提示词 / 风格...">
+          </div>
+          <div class="sp-filter-btns">
+            <button class="sp-filter-btn active" data-filter="all">全部</button>
+            <button class="sp-filter-btn" data-filter="fav">⭐ 仅收藏</button>
+          </div>
+        </div>
+
+        <div class="sp-history-list" id="sp-history-list">
+          <div class="sp-empty-history">暂无历史记录</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="sidepanel.js"></script>
+</body>
+</html>

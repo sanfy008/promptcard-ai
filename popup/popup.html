@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PromptCard</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <header class="popup-header">
+      <div class="popup-brand">
+        <div class="popup-logo">
+          <svg viewBox="0 0 24 24"><path d="M12 2L14.4 7.6L20 10L14.4 12.4L12 18L9.6 12.4L4 10L9.6 7.6L12 2Z"/></svg>
+        </div>
+        <div>
+          <span class="popup-title">PromptCard</span>
+          <span class="popup-sub">Image to Prompt AI</span>
+        </div>
+      </div>
+      <div class="popup-header-btns">
+        <button class="popup-icon-btn" id="btn-open-sidepanel" title="在侧边栏中打开">🗂️</button>
+        <button class="popup-icon-btn" id="btn-open-options" title="设置中心">⚙️</button>
+      </div>
+    </header>
+
+    <main class="popup-main">
+      <div class="action-grid">
+        <button class="action-btn" id="btn-snip-screen">
+          <div class="action-icon">✂️</div>
+          <div class="action-text">
+            <strong>截取屏幕区域</strong>
+            <span>拖拽框选任意网页图像 (Alt+Shift+P)</span>
+          </div>
+        </button>
+        
+        <label class="action-btn action-upload" id="label-upload-file">
+          <input type="file" id="input-upload-file" accept="image/*" style="display:none;">
+          <div class="action-icon">📁</div>
+          <div class="action-text">
+            <strong>上传本地图片</strong>
+            <span>支持 PNG, JPG, WebP 逆向</span>
+          </div>
+        </label>
+      </div>
+
+      <div class="status-bar" id="status-bar">
+        <div class="status-indicator" id="status-dot"></div>
+        <span class="status-text" id="status-model-text">当前引擎: 演示模式 (Mock AI)</span>
+      </div>
+
+      <div class="history-preview-section">
+        <div class="section-title-row">
+          <span>最近历史记录</span>
+          <button class="btn-text" id="btn-view-all-history">查看全部</button>
+        </div>
+        <div class="history-mini-list" id="history-mini-list">
+          <div class="empty-state">暂无历史记录，右键网页图片即可提取</div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="popup-footer">
+      <span class="footer-tip">💡 提示: 网页内直接右键点击任意图片即可秒级反推</span>
+    </footer>
+  </div>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

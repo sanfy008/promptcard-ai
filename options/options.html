@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PromptCard - 设置中心</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="opt-container">
+    <header class="opt-header">
+      <div class="opt-brand">
+        <div class="opt-logo">
+          <svg viewBox="0 0 24 24"><path d="M12 2L14.4 7.6L20 10L14.4 12.4L12 18L9.6 12.4L4 10L9.6 7.6L12 2Z"/></svg>
+        </div>
+        <div>
+          <h1 class="opt-title">PromptCard - 图像逆向提示词设置中心</h1>
+          <p class="opt-desc">配置多模型视觉 AI 引擎、自动获取可用模型列表与提示词输出偏好</p>
+        </div>
+      </div>
+      <div class="opt-header-actions">
+        <button class="opt-btn-primary" id="opt-btn-save">💾 保存配置</button>
+      </div>
+    </header>
+
+    <main class="opt-main">
+      <!-- Section 1: AI Providers -->
+      <section class="opt-section">
+        <div class="opt-section-title">
+          <h2>🤖 AI 视觉服务商配置 (Vision Model Providers)</h2>
+          <p>选择用于逆向分析图像视觉特征的大模型。默认开启「离线演示模式」，无需 Key 即可立即体验。</p>
+        </div>
+
+        <div class="opt-provider-cards">
+          <!-- Mock Card -->
+          <label class="opt-provider-card">
+            <input type="radio" name="opt-provider" value="mock" checked>
+            <div class="opt-provider-content">
+              <div class="opt-card-header">
+                <strong>✨ 离线演示模式 (Mock AI)</strong>
+                <span class="opt-badge-free">免配置</span>
+              </div>
+              <p>内置高质量专业提示词模拟引擎与多风格预设，无需 API Key 即可体验完整功能与解析格式。</p>
+            </div>
+          </label>
+
+          <!-- Google Gemini Card -->
+          <label class="opt-provider-card">
+            <input type="radio" name="opt-provider" value="gemini">
+            <div class="opt-provider-content">
+              <div class="opt-card-header">
+                <strong>Google Gemini 1.5 / 2.0</strong>
+                <span class="opt-badge">推荐 (每日 1500 次免费)</span>
+              </div>
+              <p>在 aistudio.google.com 免费申请 Key，支持自动刷新并拉取 Google 官方全部最新视觉模型！</p>
+            </div>
+          </label>
+
+          <!-- OpenAI Card -->
+          <label class="opt-provider-card">
+            <input type="radio" name="opt-provider" value="openai">
+            <div class="opt-provider-content">
+              <div class="opt-card-header">
+                <strong>OpenAI Vision (GPT-4o)</strong>
+                <span class="opt-badge">高精度</span>
+              </div>
+              <p>使用官方 GPT-4o / GPT-4o-mini 多模态视觉模型，支持自动拉取可用模型列表。</p>
+            </div>
+          </label>
+
+          <!-- Anthropic Claude Card -->
+          <label class="opt-provider-card">
+            <input type="radio" name="opt-provider" value="claude">
+            <div class="opt-provider-content">
+              <div class="opt-card-header">
+                <strong>Anthropic Claude 3.5</strong>
+                <span class="opt-badge">顶级审美</span>
+              </div>
+              <p>使用 Claude 3.5 Sonnet，在艺术风格辨析、构图与镜头术语提取上具备极强审美能力。</p>
+            </div>
+          </label>
+
+          <!-- Custom / Local Card -->
+          <label class="opt-provider-card">
+            <input type="radio" name="opt-provider" value="custom">
+            <div class="opt-provider-content">
+              <div class="opt-card-header">
+                <strong>自定义 / 本地 OpenAI 兼容 API</strong>
+                <span class="opt-badge">灵活</span>
+              </div>
+              <p>接入 Ollama、DeepSeek-VL、OneAPI、NewAPI、vLLM、SiliconFlow 等任何兼容服务。</p>
+            </div>
+          </label>
+        </div>
+
+        <div class="opt-fields-container" id="opt-fields-container">
+          <!-- Gemini Fields -->
+          <div class="opt-provider-fields" id="fields-gemini">
+            <div class="opt-field-row">
+              <label>Gemini API Key (在 <a href="https://aistudio.google.com/" target="_blank" style="color:#818cf8;">aistudio.google.com</a> 免费获取)</label>
+              <input type="password" id="opt-key-gemini" class="opt-input" placeholder="AIzaSy...">
+            </div>
+            <div class="opt-field-row">
+              <label>API Endpoint (接口地址)</label>
+              <input type="text" id="opt-endpoint-gemini" class="opt-input" value="https://generativelanguage.googleapis.com/v1beta">
+            </div>
+            <div class="opt-field-row">
+              <div class="opt-label-with-action">
+                <label>选择模型 (Model)</label>
+                <button type="button" class="opt-btn-text-action" id="opt-btn-fetch-gemini">🔄 自动拉取/刷新 Google 最新模型列表</button>
+              </div>
+              <div class="opt-select-with-btn">
+                <select id="opt-model-gemini" class="opt-input">
+                  <option value="gemini-1.5-flash">gemini-1.5-flash (极速推荐)</option>
+                  <option value="gemini-2.0-flash">gemini-2.0-flash (最新版)</option>
+                  <option value="gemini-1.5-pro">gemini-1.5-pro (深度解析)</option>
+                  <option value="gemini-2.0-flash-exp">gemini-2.0-flash-exp</option>
+                  <option value="custom">✎ 自定义手动输入模型名称...</option>
+                </select>
+                <input type="text" id="opt-model-gemini-custom" class="opt-input" placeholder="输入自定义 Gemini 模型名称..." style="display:none; margin-top:6px;">
+              </div>
+            </div>
+          </div>
+
+          <!-- OpenAI Fields -->
+          <div class="opt-provider-fields" id="fields-openai" style="display: none;">
+            <div class="opt-field-row">
+              <label>OpenAI API Key</label>
+              <input type="password" id="opt-key-openai" class="opt-input" placeholder="sk-...">
+            </div>
+            <div class="opt-field-row">
+              <label>API Endpoint</label>
+              <input type="text" id="opt-endpoint-openai" class="opt-input" value="https://api.openai.com/v1">
+            </div>
+            <div class="opt-field-row">
+              <div class="opt-label-with-action">
+                <label>选择模型 (Model)</label>
+                <button type="button" class="opt-btn-text-action" id="opt-btn-fetch-openai">🔄 刷新 OpenAI 可用模型</button>
+              </div>
+              <select id="opt-model-openai" class="opt-input">
+                <option value="gpt-4o">gpt-4o (高精度推荐)</option>
+                <option value="gpt-4o-mini">gpt-4o-mini (经济轻量)</option>
+                <option value="gpt-4-turbo">gpt-4-turbo</option>
+                <option value="custom">✎ 自定义手动输入模型名称...</option>
+              </select>
+              <input type="text" id="opt-model-openai-custom" class="opt-input" placeholder="输入自定义 OpenAI 模型名称..." style="display:none; margin-top:6px;">
+            </div>
+          </div>
+
+          <!-- Claude Fields -->
+          <div class="opt-provider-fields" id="fields-claude" style="display: none;">
+            <div class="opt-field-row">
+              <label>Anthropic API Key</label>
+              <input type="password" id="opt-key-claude" class="opt-input" placeholder="sk-ant-...">
+            </div>
+            <div class="opt-field-row">
+              <label>API Endpoint</label>
+              <input type="text" id="opt-endpoint-claude" class="opt-input" value="https://api.anthropic.com/v1">
+            </div>
+            <div class="opt-field-row">
+              <label>模型名称 (Model)</label>
+              <select id="opt-model-claude" class="opt-input">
+                <option value="claude-3-5-sonnet-20241022">claude-3-5-sonnet-20241022 (强烈推荐)</option>
+                <option value="claude-3-haiku-20240307">claude-3-haiku-20240307 (高速轻量)</option>
+                <option value="claude-3-opus-20240229">claude-3-opus-20240229</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Custom Fields -->
+          <div class="opt-provider-fields" id="fields-custom" style="display: none;">
+            <div class="opt-field-row">
+              <label>自定义 Base URL (例如: http://localhost:11434/v1 或中转接口)</label>
+              <input type="text" id="opt-endpoint-custom" class="opt-input" placeholder="https://api.openai.com/v1">
+            </div>
+            <div class="opt-field-row">
+              <label>API Key (本地 Ollama 可填 sk-none)</label>
+              <input type="password" id="opt-key-custom" class="opt-input" placeholder="sk-...">
+            </div>
+            <div class="opt-field-row">
+              <div class="opt-label-with-action">
+                <label>自定义模型名称</label>
+                <button type="button" class="opt-btn-text-action" id="opt-btn-fetch-custom">🔄 获取端点模型列表</button>
+              </div>
+              <input type="text" id="opt-model-custom" class="opt-input" value="gpt-4o" placeholder="gpt-4o / llava / qwen2.5-vl">
+            </div>
+          </div>
+
+          <div class="opt-test-row">
+            <button class="opt-btn-secondary" id="opt-btn-test">⚡ 测试当前 API 连通性</button>
+            <span id="opt-test-result" class="opt-test-result"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 2: Midjourney Defaults -->
+      <section class="opt-section">
+        <div class="opt-section-title">
+          <h2>🎨 Midjourney 默认生图参数</h2>
+          <p>设置逆向生成 Midjourney 提示词时的默认追加后缀参数。</p>
+        </div>
+
+        <div class="opt-grid-2">
+          <div class="opt-field-row">
+            <label>默认版本 (--v)</label>
+            <select id="opt-mj-v" class="opt-input">
+              <option value="6.0">v 6.0</option>
+              <option value="6.1">v 6.1</option>
+              <option value="5.2">v 5.2</option>
+              <option value="niji 6">niji 6</option>
+            </select>
+          </div>
+          <div class="opt-field-row">
+            <label>默认 Stylize (--stylize)</label>
+            <input type="number" id="opt-mj-stylize" class="opt-input" value="250" min="0" max="1000" step="50">
+          </div>
+          <div class="opt-field-row">
+            <label>默认 Style (--style)</label>
+            <select id="opt-mj-style" class="opt-input">
+              <option value="raw">raw (保留写实质感)</option>
+              <option value="">默认 (不加 raw)</option>
+            </select>
+          </div>
+          <div class="opt-field-row">
+            <label>默认宽高比 (--ar)</label>
+            <select id="opt-mj-ar" class="opt-input">
+              <option value="auto">自动计算原图比例</option>
+              <option value="16:9">16:9</option>
+              <option value="9:16">9:16</option>
+              <option value="1:1">1:1</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Interface & Language -->
+      <section class="opt-section">
+        <div class="opt-section-title">
+          <h2>🌐 偏好设置 (Preferences)</h2>
+          <p>自定义默认语言及页面交互行为。</p>
+        </div>
+
+        <div class="opt-grid-2">
+          <div class="opt-field-row">
+            <label>默认输出语言</label>
+            <select id="opt-pref-lang" class="opt-input">
+              <option value="en">English (AI 生图最佳推荐)</option>
+              <option value="zh-CN">简体中文 (中文描述与标签)</option>
+              <option value="zh-TW">繁體中文</option>
+              <option value="ja">日本語</option>
+            </select>
+          </div>
+          <div class="opt-field-row">
+            <label>网页悬浮卡片</label>
+            <select id="opt-pref-floating" class="opt-input">
+              <option value="true">开启 (右键/截图后在网页内弹出悬浮卡片)</option>
+              <option value="false">关闭 (仅通过 Popup 或侧边栏查看)</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 4: Data Management -->
+      <section class="opt-section">
+        <div class="opt-section-title">
+          <h2>💾 数据管理与备份</h2>
+          <p>所有历史记录均保存在本地浏览器中，充分保护数据隐私。</p>
+        </div>
+
+        <div class="opt-data-actions">
+          <button class="opt-btn-secondary" id="opt-btn-export">📥 导出历史记录 (JSON)</button>
+          <input type="file" id="opt-file-import" accept=".json" style="display:none;">
+          <button class="opt-btn-secondary" id="opt-btn-import">📤 导入历史记录 (JSON)</button>
+          <button class="opt-btn-danger" id="opt-btn-reset">⚠️ 清空所有历史数据</button>
+        </div>
+      </section>
+    </main>
+
+    <div class="opt-toast" id="opt-toast">✨ 配置已成功保存！</div>
+  </div>
+
+  <script type="module" src="options.js"></script>
+</body>
+</html>
