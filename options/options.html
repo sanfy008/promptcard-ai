@@ -15,7 +15,7 @@
         </div>
         <div>
           <h1 class="opt-title">PromptCard - 图像逆向提示词设置中心</h1>
-          <p class="opt-desc">配置多模型视觉 AI 引擎、自动获取可用模型列表与提示词输出偏好</p>
+          <p class="opt-desc">配置 2026 前沿多模态视觉 AI 引擎、自动获取可用模型列表与提示词输出偏好</p>
         </div>
       </div>
       <div class="opt-header-actions">
@@ -49,10 +49,10 @@
             <input type="radio" name="opt-provider" value="gemini">
             <div class="opt-provider-content">
               <div class="opt-card-header">
-                <strong>Google Gemini 1.5 / 2.0</strong>
-                <span class="opt-badge">推荐 (每日 1500 次免费)</span>
+                <strong>Google Gemini 2.0 / 1.5</strong>
+                <span class="opt-badge">推荐 (每日免费额度)</span>
               </div>
-              <p>在 aistudio.google.com 免费申请 Key，支持自动刷新并拉取 Google 官方全部最新视觉模型！</p>
+              <p>在 aistudio.google.com 免费申请 Key，支持自动拉取 Gemini 2.0 Flash / Pro 等全部最新视觉模型！</p>
             </div>
           </label>
 
@@ -61,10 +61,10 @@
             <input type="radio" name="opt-provider" value="openai">
             <div class="opt-provider-content">
               <div class="opt-card-header">
-                <strong>OpenAI Vision (GPT-4o)</strong>
-                <span class="opt-badge">高精度</span>
+                <strong>OpenAI (GPT-4o / o3-mini / o1)</strong>
+                <span class="opt-badge">高精度多模态</span>
               </div>
-              <p>使用官方 GPT-4o / GPT-4o-mini 多模态视觉模型，支持自动拉取可用模型列表。</p>
+              <p>使用官方 GPT-4o、o3-mini、o1 多模态视觉模型，支持自动拉取可用模型列表。</p>
             </div>
           </label>
 
@@ -73,10 +73,10 @@
             <input type="radio" name="opt-provider" value="claude">
             <div class="opt-provider-content">
               <div class="opt-card-header">
-                <strong>Anthropic Claude 3.5</strong>
-                <span class="opt-badge">顶级审美</span>
+                <strong>Anthropic Claude 3.7 / 3.5</strong>
+                <span class="opt-badge">深度推理与顶级审美</span>
               </div>
-              <p>使用 Claude 3.5 Sonnet，在艺术风格辨析、构图与镜头术语提取上具备极强审美能力。</p>
+              <p>使用 Claude 3.7 Sonnet (混合推理) 或 Claude 3.5 Sonnet，艺术风格辨析能力出众。</p>
             </div>
           </label>
 
@@ -86,9 +86,9 @@
             <div class="opt-provider-content">
               <div class="opt-card-header">
                 <strong>自定义 / 本地 OpenAI 兼容 API</strong>
-                <span class="opt-badge">灵活</span>
+                <span class="opt-badge">灵活自建</span>
               </div>
-              <p>接入 Ollama、DeepSeek-VL、OneAPI、NewAPI、vLLM、SiliconFlow 等任何兼容服务。</p>
+              <p>接入 Qwen2.5-VL、DeepSeek-VL2、Ollama、SiliconFlow、OneAPI、vLLM 等任何兼容端点。</p>
             </div>
           </label>
         </div>
@@ -111,10 +111,10 @@
               </div>
               <div class="opt-select-with-btn">
                 <select id="opt-model-gemini" class="opt-input">
-                  <option value="gemini-1.5-flash">gemini-1.5-flash (极速推荐)</option>
-                  <option value="gemini-2.0-flash">gemini-2.0-flash (最新版)</option>
-                  <option value="gemini-1.5-pro">gemini-1.5-pro (深度解析)</option>
-                  <option value="gemini-2.0-flash-exp">gemini-2.0-flash-exp</option>
+                  <option value="gemini-2.0-flash">gemini-2.0-flash (最新极速推荐)</option>
+                  <option value="gemini-2.0-flash-exp">gemini-2.0-flash-exp (实验前沿)</option>
+                  <option value="gemini-1.5-flash">gemini-1.5-flash (经典稳定)</option>
+                  <option value="gemini-1.5-pro">gemini-1.5-pro (深度多模态)</option>
                   <option value="custom">✎ 自定义手动输入模型名称...</option>
                 </select>
                 <input type="text" id="opt-model-gemini-custom" class="opt-input" placeholder="输入自定义 Gemini 模型名称..." style="display:none; margin-top:6px;">
@@ -138,9 +138,11 @@
                 <button type="button" class="opt-btn-text-action" id="opt-btn-fetch-openai">🔄 刷新 OpenAI 可用模型</button>
               </div>
               <select id="opt-model-openai" class="opt-input">
-                <option value="gpt-4o">gpt-4o (高精度推荐)</option>
+                <option value="gpt-4o">gpt-4o (全能视觉旗舰)</option>
                 <option value="gpt-4o-mini">gpt-4o-mini (经济轻量)</option>
-                <option value="gpt-4-turbo">gpt-4-turbo</option>
+                <option value="o3-mini">o3-mini (前沿推理)</option>
+                <option value="o1">o1 (复杂逻辑推理)</option>
+                <option value="gpt-4.5-preview">gpt-4.5-preview</option>
                 <option value="custom">✎ 自定义手动输入模型名称...</option>
               </select>
               <input type="text" id="opt-model-openai-custom" class="opt-input" placeholder="输入自定义 OpenAI 模型名称..." style="display:none; margin-top:6px;">
@@ -160,8 +162,9 @@
             <div class="opt-field-row">
               <label>模型名称 (Model)</label>
               <select id="opt-model-claude" class="opt-input">
-                <option value="claude-3-5-sonnet-20241022">claude-3-5-sonnet-20241022 (强烈推荐)</option>
-                <option value="claude-3-haiku-20240307">claude-3-haiku-20240307 (高速轻量)</option>
+                <option value="claude-3-7-sonnet-20250219">claude-3-7-sonnet-20250219 (混合推理旗舰)</option>
+                <option value="claude-3-5-sonnet-20241022">claude-3-5-sonnet-20241022 (顶级审美推荐)</option>
+                <option value="claude-3-5-haiku-20241022">claude-3-5-haiku-20241022 (高速轻量)</option>
                 <option value="claude-3-opus-20240229">claude-3-opus-20240229</option>
               </select>
             </div>
@@ -182,7 +185,7 @@
                 <label>自定义模型名称</label>
                 <button type="button" class="opt-btn-text-action" id="opt-btn-fetch-custom">🔄 获取端点模型列表</button>
               </div>
-              <input type="text" id="opt-model-custom" class="opt-input" value="gpt-4o" placeholder="gpt-4o / llava / qwen2.5-vl">
+              <input type="text" id="opt-model-custom" class="opt-input" value="qwen2.5-vl" placeholder="qwen2.5-vl / deepseek-vl2 / gpt-4o / llava">
             </div>
           </div>
 
@@ -204,8 +207,8 @@
           <div class="opt-field-row">
             <label>默认版本 (--v)</label>
             <select id="opt-mj-v" class="opt-input">
+              <option value="6.1">v 6.1 (最新版)</option>
               <option value="6.0">v 6.0</option>
-              <option value="6.1">v 6.1</option>
               <option value="5.2">v 5.2</option>
               <option value="niji 6">niji 6</option>
             </select>
@@ -228,6 +231,8 @@
               <option value="16:9">16:9</option>
               <option value="9:16">9:16</option>
               <option value="1:1">1:1</option>
+              <option value="4:5">4:5 (社媒竖版)</option>
+              <option value="21:9">21:9 (宽幅电影)</option>
             </select>
           </div>
         </div>

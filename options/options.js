@@ -23,17 +23,17 @@ async function loadSettings() {
 
   document.getElementById('opt-endpoint-claude').value = settings.endpoints?.claude || 'https://api.anthropic.com/v1';
   document.getElementById('opt-key-claude').value = settings.apiKeys?.claude || '';
-  document.getElementById('opt-model-claude').value = settings.models?.claude || 'claude-3-5-sonnet-20241022';
+  document.getElementById('opt-model-claude').value = settings.models?.claude || 'claude-3-7-sonnet-20250219';
 
   document.getElementById('opt-endpoint-custom').value = settings.endpoints?.custom || 'https://api.openai.com/v1';
   document.getElementById('opt-key-custom').value = settings.apiKeys?.custom || '';
-  document.getElementById('opt-model-custom').value = settings.models?.custom || 'gpt-4o';
+  document.getElementById('opt-model-custom').value = settings.models?.custom || 'qwen2.5-vl';
 
   // Populate cached models if available
   if (settings.cachedModelLists?.gemini?.length > 0) {
-    populateModelSelect('opt-model-gemini', settings.cachedModelLists.gemini, settings.models?.gemini || 'gemini-1.5-flash');
+    populateModelSelect('opt-model-gemini', settings.cachedModelLists.gemini, settings.models?.gemini || 'gemini-2.0-flash');
   } else {
-    document.getElementById('opt-model-gemini').value = settings.models?.gemini || 'gemini-1.5-flash';
+    document.getElementById('opt-model-gemini').value = settings.models?.gemini || 'gemini-2.0-flash';
   }
 
   if (settings.cachedModelLists?.openai?.length > 0) {
@@ -42,7 +42,7 @@ async function loadSettings() {
     document.getElementById('opt-model-openai').value = settings.models?.openai || 'gpt-4o';
   }
 
-  document.getElementById('opt-mj-v').value = settings.midjourneyPreset?.version || '6.0';
+  document.getElementById('opt-mj-v').value = settings.midjourneyPreset?.version || '6.1';
   document.getElementById('opt-mj-stylize').value = settings.midjourneyPreset?.stylize || 250;
   document.getElementById('opt-mj-style').value = settings.midjourneyPreset?.style || 'raw';
   document.getElementById('opt-mj-ar').value = settings.midjourneyPreset?.ar || 'auto';
@@ -111,7 +111,7 @@ function setupEventListeners() {
       const models = await AIService.fetchAvailableModels('gemini', apiKey, endpoint);
       if (models.length === 0) throw new Error('未获取到可用模型');
 
-      populateModelSelect('opt-model-gemini', models, 'gemini-1.5-flash');
+      populateModelSelect('opt-model-gemini', models, 'gemini-2.0-flash');
 
       const settings = await StorageService.getSettings();
       settings.cachedModelLists = settings.cachedModelLists || {};
@@ -142,7 +142,7 @@ function setupEventListeners() {
     btnFetchOpenAI.innerText = '⏳ 正在拉取...';
     try {
       const models = await AIService.fetchAvailableModels('openai', apiKey, endpoint);
-      const filtered = models.filter(m => m.includes('gpt') || m.includes('o1') || m.includes('chatgpt') || m.includes('dall'));
+      const filtered = models.filter(m => m.includes('gpt') || m.includes('o1') || m.includes('o3') || m.includes('chatgpt') || m.includes('dall'));
       const listToUse = filtered.length > 0 ? filtered : models;
 
       populateModelSelect('opt-model-openai', listToUse, 'gpt-4o');
@@ -237,7 +237,7 @@ async function getCurrentFormSettings() {
 
   let geminiModel = document.getElementById('opt-model-gemini').value;
   if (geminiModel === 'custom') {
-    geminiModel = document.getElementById('opt-model-gemini-custom').value.trim() || 'gemini-1.5-flash';
+    geminiModel = document.getElementById('opt-model-gemini-custom').value.trim() || 'gemini-2.0-flash';
   }
 
   let openaiModel = document.getElementById('opt-model-openai').value;
